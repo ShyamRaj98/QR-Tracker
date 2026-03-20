@@ -8,10 +8,16 @@ import QRListPage from './pages/QRListPage'
 import QRCreatePage from './pages/QRCreatePage'
 import QREditPage from './pages/QREditPage'
 import AnalyticsPage from './pages/AnalyticsPage'
+import TeamPage from './pages/TeamPage'
 
 const Guard = ({ children }) => {
   const token = useAuthStore(s => s.accessToken)
   return token ? children : <Navigate to="/login" replace />
+}
+
+const AdminGuard = ({ children }) => {
+  const user = useAuthStore(s => s.user)
+  return user?.role === 'admin' ? children : <Navigate to="/" replace />
 }
 
 export default function App() {
@@ -25,6 +31,7 @@ export default function App() {
         <Route path="qr/create" element={<QRCreatePage />} />
         <Route path="qr/:id/edit" element={<QREditPage />} />
         <Route path="qr/:id/analytics" element={<AnalyticsPage />} />
+        <Route path="users" element={<AdminGuard><TeamPage /></AdminGuard>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

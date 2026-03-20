@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { QrCode, ScanLine, TrendingUp, Clock, Plus, ArrowRight } from 'lucide-react'
+import { QrCode, ScanLine, TrendingUp, Plus, ArrowRight } from 'lucide-react'
 import api from '../utils/api'
 import useAuthStore from '../store/authStore'
 
@@ -32,21 +32,18 @@ export default function DashboardPage() {
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-xl font-semibold text-gray-900">Good day, {user?.name?.split(' ')[0]} 👋</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Here's what's happening with your QR codes</p>
+        <h1 className="text-xl font-semibold text-gray-900">Welcome, {user?.name?.split(' ')[0]} 👋</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Company QR code dashboard</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <StatCard icon={QrCode} label="Total QR codes" value={overview?.qrCount} color="bg-sky-50 text-sky-600" />
         <StatCard icon={ScanLine} label="Total scans" value={overview?.totalScans?.toLocaleString()} color="bg-emerald-50 text-emerald-600" />
-        <StatCard icon={TrendingUp} label="Scans (30 days)" value={overview?.recentScans?.toLocaleString()} color="bg-violet-50 text-violet-600" />
-        <StatCard icon={Clock} label="Plan limit" value={`${overview?.qrCount || 0}/${user?.limits?.qrCodes}`} color="bg-amber-50 text-amber-600" />
+        <StatCard icon={TrendingUp} label="Scans this month" value={overview?.recentScans?.toLocaleString()} color="bg-violet-50 text-violet-600" />
       </div>
 
-      {/* Recent QR codes */}
       <div className="card">
-        <div className="flex items-center justify-between px-5 py-4 border-b">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <h2 className="font-medium text-gray-900">Recent QR codes</h2>
           <div className="flex items-center gap-2">
             <Link to="/qr/create" className="btn-primary text-xs px-3 py-1.5">
@@ -67,7 +64,7 @@ export default function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className="divide-y">
+          <div className="divide-y divide-gray-100">
             {recentQR.data.map(qr => (
               <div key={qr._id} className="flex items-center gap-4 px-5 py-3 hover:bg-gray-50 transition-colors">
                 <img src={qr.qrImage} alt={qr.name} className="w-10 h-10 rounded border" />
