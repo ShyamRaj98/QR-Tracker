@@ -1,33 +1,55 @@
 import axios from 'axios'
 import useAuthStore from '../store/authStore'
 
-const api = axios.create({ baseURL: '/api' })
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  timeout: 10000
+})
 
-// Attach access token to every request
+// Request interceptor
 api.interceptors.request.use(cfg => {
   const token = useAuthStore.getState().accessToken
-  if (token) cfg.headers.Authorization = `Bearer ${token}`
+  if (token) {
+    cfg.headers.Authorization = `Bearer ${token}`
+  }
   return cfg
 })
 
-// Auto-refresh on 401
+// Response interceptor
 api.interceptors.response.use(
   res => res,
   async err => {
     const original = err.config
-    if (err.response?.status === 401 && !original._retry) {
+
+    if (
+      err.response?.status === 401 &&
+      !original._retry &&
+      !original.url.includes('/auth/refresh')
+    ) {
       original._retry = true
+
       try {
         const { refreshToken, setTokens, logout } = useAuthStore.getState()
-        if (!refreshToken) { logout(); return Promise.reject(err) }
-        const { data } = await axios.post('/api/auth/refresh', { refreshToken })
+
+        if (!refreshToken) {
+          logout()
+          return Promise.reject(err)
+        }
+
+        const { data } = await api.post('/auth/refresh', { refreshToken })
+
         setTokens(data.accessToken, data.refreshToken)
+
         original.headers.Authorization = `Bearer ${data.accessToken}`
+
         return api(original)
-      } catch {
-        useAuthStore.getState().logout()
+
+      } catch (refreshError) {
+        logout()
+        return Promise.reject(refreshError)
       }
     }
+
     return Promise.reject(err)
   }
 )
