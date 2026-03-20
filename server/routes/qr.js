@@ -39,10 +39,10 @@ router.post('/', protect, async (req, res) => {
     if (!name || !destinationUrl) return res.status(400).json({ error: 'Name and destination URL required' });
 
     // Check plan limits
-    const count = await QRCode.countDocuments({ user: req.user._id });
-    if (count >= req.user.limits.qrCodes) {
-      return res.status(403).json({ error: `QR code limit (${req.user.limits.qrCodes}) reached. Upgrade your plan.` });
-    }
+    // const count = await QRCode.countDocuments({ user: req.user._id });
+    // if (count >= req.user.limits.qrCodes) {
+    //   return res.status(403).json({ error: `QR code limit (${req.user.limits.qrCodes}) reached. Upgrade your plan.` });
+    // }
 
     const shortCode = nanoid(8);
     const qr = await QRCode.create({
